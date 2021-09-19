@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.aybarsacar.cookpad.ui.home.HomeFragment"
+        android:name="com.aybarsacar.cookpad.view.fragments.AllRecipesFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_all_recipes" />
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.aybarsacar.cookpad.ui.dashboard.DashboardFragment"
+        android:name="com.aybarsacar.cookpad.view.fragments.DashboardFragment"
         android:label="@string/title_dashboard"
         tools:layout="@layout/fragment_dashboard" />
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.aybarsacar.cookpad.ui.notifications.NotificationsFragment"
+        android:name="com.aybarsacar.cookpad.view.fragments.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
 </navigation>

@@ -1,4 +1,4 @@
-package com.aybarsacar.cookpad.ui.notifications
+package com.aybarsacar.cookpad.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
