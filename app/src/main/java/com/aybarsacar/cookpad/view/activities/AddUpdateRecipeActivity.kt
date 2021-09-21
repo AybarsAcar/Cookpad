@@ -15,20 +15,26 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
+import android.text.BoringLayout.make
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.aybarsacar.cookpad.R
+import com.aybarsacar.cookpad.application.CookPadApplication
 import com.aybarsacar.cookpad.databinding.ActivityAddUpdateRecipeBinding
 import com.aybarsacar.cookpad.databinding.DialogCustomImageSelectionBinding
 import com.aybarsacar.cookpad.databinding.DialogCustomListBinding
+import com.aybarsacar.cookpad.model.entities.Recipe
 import com.aybarsacar.cookpad.utils.Constants
 import com.aybarsacar.cookpad.view.adaptors.ListItemAdaptor
+import com.aybarsacar.cookpad.viewmodel.RecipeViewModel
+import com.aybarsacar.cookpad.viewmodel.RecipeViewModelFactory
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -49,7 +55,6 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.lang.Exception
 import java.util.*
-import kotlin.math.log
 
 
 /**
@@ -59,6 +64,11 @@ class AddUpdateRecipeActivity : AppCompatActivity(), View.OnClickListener {
 
   companion object {
     private const val IMAGE_DIRECTORY = "CookPod"
+  }
+
+  // inject the view models
+  private val _recipeViewModel: RecipeViewModel by viewModels {
+    RecipeViewModelFactory((application as CookPadApplication).repository)
   }
 
 
@@ -366,12 +376,13 @@ class AddUpdateRecipeActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         R.id.btn_add_dish -> {
-          val title = _binding.etTitle.text.trim { it <= ' ' } // remove empty spaces
-          val type = _binding.etType.text.trim { it <= ' ' }
-          val category = _binding.etCategory.text.trim { it <= ' ' }
-          val ingredients = _binding.etIngredients.text
-          val cookingTimeInMinutes = _binding.etCookingTime.text.trim { it <= ' ' }
-          val cookingInstructions = _binding.etDirectionToCook.text
+          val title =
+            _binding.etTitle.text.toString().trim { it <= ' ' } // remove empty spaces in the beginning and at the end
+          val type = _binding.etType.text.toString().trim { it <= ' ' }
+          val category = _binding.etCategory.text.toString().trim { it <= ' ' }
+          val ingredients = _binding.etIngredients.text.toString().trim { it <= ' ' }
+          val cookingTimeInMinutes = _binding.etCookingTime.text.toString().trim { it <= ' ' }
+          val cookingInstructions = _binding.etDirectionToCook.text.toString().trim { it <= ' ' }
 
           when {
             TextUtils.isEmpty(_imagePath) -> {
@@ -405,7 +416,25 @@ class AddUpdateRecipeActivity : AppCompatActivity(), View.OnClickListener {
 
             else -> {
               // data is clean we can post it
-              Snackbar.make(v, "All Entries are valid", Snackbar.LENGTH_LONG).show()
+              // add the new recipe to the database
+              val recipeToInsert = Recipe(
+                _imagePath,
+                Constants.RECIPE_IMAGE_SOURCE_LOCAL,
+                title,
+                type,
+                category,
+                ingredients,
+                cookingTimeInMinutes,
+                cookingInstructions,
+                true
+              )
+
+              _recipeViewModel.insert(recipeToInsert)
+
+              Toast.makeText(this@AddUpdateRecipeActivity, "Recipe is added successfully!", Toast.LENGTH_LONG).show()
+
+              // close the current activity
+              finish()
             }
           }
         }
