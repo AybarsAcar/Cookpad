@@ -9,10 +9,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
 import com.aybarsacar.cookpad.R
 import com.aybarsacar.cookpad.application.CookPadApplication
 import com.aybarsacar.cookpad.databinding.FragmentAllRecipesBinding
 import com.aybarsacar.cookpad.view.activities.AddUpdateRecipeActivity
+import com.aybarsacar.cookpad.view.adaptors.RecipeCardAdaptor
 import com.aybarsacar.cookpad.viewmodel.HomeViewModel
 import com.aybarsacar.cookpad.viewmodel.RecipeViewModel
 import com.aybarsacar.cookpad.viewmodel.RecipeViewModelFactory
@@ -20,12 +22,9 @@ import com.aybarsacar.cookpad.viewmodel.RecipeViewModelFactory
 
 class AllRecipesFragment : Fragment() {
 
-  private lateinit var homeViewModel: HomeViewModel
   private var _binding: FragmentAllRecipesBinding? = null
-
-  // This property is only valid between onCreateView and
-  // onDestroyView.
   private val binding get() = _binding!!
+
 
   // setup the view model to query
   private val _recipeViewModel: RecipeViewModel by viewModels {
@@ -42,11 +41,30 @@ class AllRecipesFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
+    // now _binding is available
+    binding.rvRecipesList.layoutManager = GridLayoutManager(requireActivity(), 2)
+
+    val recipeCardAdapter = RecipeCardAdaptor(this@AllRecipesFragment)
+    binding.rvRecipesList.adapter = recipeCardAdapter
+
+
     // fetch all the recipes and observe it
     _recipeViewModel.recipesList.observe(viewLifecycleOwner) { recipes ->
       recipes?.let {
-        for (recipe in it) {
-          Log.i("Recipe Title", recipe.title)
+
+        // display the cards
+        if (it.isEmpty()) {
+          // we don't have any recipes
+          binding.rvRecipesList.visibility = View.GONE
+          binding.tvNoRecipesAddedYet.visibility = View.VISIBLE
+        } else {
+          // we have recipes to display
+          // make sure set the visibility
+          binding.rvRecipesList.visibility = View.VISIBLE
+          binding.tvNoRecipesAddedYet.visibility = View.GONE
+
+          recipeCardAdapter.recipesList(it)
+
         }
       }
     }
@@ -57,17 +75,11 @@ class AllRecipesFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View? {
-    homeViewModel =
-      ViewModelProvider(this).get(HomeViewModel::class.java)
 
+    // set up the binding inside of a fragment
     _binding = FragmentAllRecipesBinding.inflate(inflater, container, false)
-    val root: View = binding.root
 
-    val textView: TextView = binding.textHome
-    homeViewModel.text.observe(viewLifecycleOwner, Observer {
-      textView.text = it
-    })
-    return root
+    return binding.root
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

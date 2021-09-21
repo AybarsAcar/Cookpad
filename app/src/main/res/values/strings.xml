@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">CookPad</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_home">All Recipes</string>
+    <string name="title_dashboard">Favourite Recipes</string>
+    <string name="title_notifications">Random Recipe</string>
     <string name="splash_screen_title">Cook Pad</string>
     <string name="add_recipe">Add a Recipe</string>
 </resources>

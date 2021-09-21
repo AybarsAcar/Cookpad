@@ -3,23 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_all_recipes">
 
     <fragment
-        android:id="@+id/navigation_home"
+        android:id="@+id/navigation_all_recipes"
         android:name="com.aybarsacar.cookpad.view.fragments.AllRecipesFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_all_recipes" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.aybarsacar.cookpad.view.fragments.DashboardFragment"
+        android:id="@+id/navigation_favourite_dishes"
+        android:name="com.aybarsacar.cookpad.view.fragments.FavouriteRecipesFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_favourite_recipes" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.aybarsacar.cookpad.view.fragments.NotificationsFragment"
+        android:id="@+id/navigation_random_recipe"
+        android:name="com.aybarsacar.cookpad.view.fragments.RandomRecipeFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_random_dish" />
 </navigation>
