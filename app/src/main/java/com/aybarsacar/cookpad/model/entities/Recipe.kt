@@ -1,11 +1,13 @@
 package com.aybarsacar.cookpad.model.entities
 
-import android.text.Editable
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
 
 
+@Parcelize
 @Entity(tableName = "recipe_table")
 data class Recipe(
 
@@ -21,4 +23,4 @@ data class Recipe(
 
   @PrimaryKey(autoGenerate = true) val id: Int = 0,
 
-  )
+  ) : Parcelable

@@ -9,7 +9,11 @@
         android:id="@+id/navigation_all_recipes"
         android:name="com.aybarsacar.cookpad.view.fragments.AllRecipesFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_all_recipes" />
+        tools:layout="@layout/fragment_all_recipes">
+        <action
+            android:id="@+id/action_navigation_all_recipes_to_navigation_recipe_details"
+            app:destination="@id/navigation_recipe_details" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_favourite_dishes"
@@ -22,4 +26,17 @@
         android:name="com.aybarsacar.cookpad.view.fragments.RandomRecipeFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_random_dish" />
+
+    <fragment
+        android:id="@+id/navigation_recipe_details"
+        android:name="com.aybarsacar.cookpad.view.fragments.RecipeDetailsFragment"
+        android:label="@string/title_recipe_details"
+        tools:layout="@layout/fragment_recipe_details">
+
+        <argument
+            android:name="recipeDetails"
+            app:argType="com.aybarsacar.cookpad.model.entities.Recipe" />
+
+    </fragment>
+
 </navigation>

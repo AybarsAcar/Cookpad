@@ -21,6 +21,11 @@
     <color name="dish_image_background">#e1e1e1</color>
     <color name="blue_grey_700">#37473f</color>
     <color name="grey_900">#212121</color>
+    <color name="grey_500">#9e9e9e</color>
+    <color name="blue_grey_900">#263238</color>
+
+
+    <color name="red_dark">#911F27</color>
 
 
 </resources>

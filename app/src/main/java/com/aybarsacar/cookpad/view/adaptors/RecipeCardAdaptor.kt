@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.aybarsacar.cookpad.databinding.ItemRecipeLayoutBinding
 import com.aybarsacar.cookpad.model.entities.Recipe
+import com.aybarsacar.cookpad.view.fragments.AllRecipesFragment
 import com.bumptech.glide.Glide
 
 class RecipeCardAdaptor(private val fragment: Fragment) : RecyclerView.Adapter<RecipeCardAdaptor.ViewHolder>() {
@@ -37,6 +38,14 @@ class RecipeCardAdaptor(private val fragment: Fragment) : RecyclerView.Adapter<R
       .into(holder.ivRecipeImage)
 
     holder.tvTitle.text = recipe.title
+
+
+    holder.itemView.setOnClickListener {
+      if (fragment is AllRecipesFragment) {
+        // handle navigating to the details page
+        fragment.handleRecipeDetailsNavigation(recipe)
+      }
+    }
   }
 
   override fun getItemCount(): Int {

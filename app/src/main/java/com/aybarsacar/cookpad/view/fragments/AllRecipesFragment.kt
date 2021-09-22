@@ -9,11 +9,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.aybarsacar.cookpad.R
 import com.aybarsacar.cookpad.application.CookPadApplication
 import com.aybarsacar.cookpad.databinding.FragmentAllRecipesBinding
+import com.aybarsacar.cookpad.model.entities.Recipe
 import com.aybarsacar.cookpad.view.activities.AddUpdateRecipeActivity
+import com.aybarsacar.cookpad.view.activities.MainActivity
 import com.aybarsacar.cookpad.view.adaptors.RecipeCardAdaptor
 import com.aybarsacar.cookpad.viewmodel.HomeViewModel
 import com.aybarsacar.cookpad.viewmodel.RecipeViewModel
@@ -105,5 +108,27 @@ class AllRecipesFragment : Fragment() {
   override fun onDestroyView() {
     super.onDestroyView()
     _binding = null
+  }
+
+  override fun onResume() {
+    super.onResume()
+
+    // show the navigation when we come back
+    if (requireActivity() is MainActivity) {
+      (activity as MainActivity).showBottomNavigationView()
+    }
+  }
+
+  /**
+   * handles the navigating to the details page
+   * called from the Recipe Card Adaptor
+   */
+  fun handleRecipeDetailsNavigation(recipe: Recipe) {
+    findNavController().navigate(AllRecipesFragmentDirections.actionNavigationAllRecipesToNavigationRecipeDetails(recipe))
+
+    // hide the navigation
+    if (requireActivity() is MainActivity) {
+      (activity as MainActivity).hideBottomNavigationView()
+    }
   }
 }

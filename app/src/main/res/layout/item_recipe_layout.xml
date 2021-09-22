@@ -6,9 +6,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
 
+    android:clickable="true"
+    android:focusable="true"
+
+    android:foreground="?android:attr/selectableItemBackground"
+
     app:cardCornerRadius="@dimen/_5sdp"
     app:cardElevation="@dimen/_5sdp"
-
     app:cardUseCompatPadding="true">
 
     <LinearLayout
