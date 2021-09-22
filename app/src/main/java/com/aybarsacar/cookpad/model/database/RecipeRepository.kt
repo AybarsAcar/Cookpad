@@ -17,4 +17,11 @@ class RecipeRepository(private val recipeDao: RecipeDao) {
 
   val recipesList: Flow<List<Recipe>> = recipeDao.getAllRecipesList()
 
+
+  @WorkerThread
+  suspend fun updateRecipeData(recipe: Recipe) {
+    recipeDao.updateRecipeDetails(recipe)
+  }
+
+  val favouriteRecipes: Flow<List<Recipe>> = recipeDao.getFavouriteRecipesList()
 }

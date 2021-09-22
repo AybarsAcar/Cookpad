@@ -7,16 +7,22 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.palette.graphics.Palette
 import com.aybarsacar.cookpad.R
+import com.aybarsacar.cookpad.application.CookPadApplication
 import com.aybarsacar.cookpad.databinding.FragmentRecipeDetailsBinding
+import com.aybarsacar.cookpad.viewmodel.RecipeViewModel
+import com.aybarsacar.cookpad.viewmodel.RecipeViewModelFactory
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.google.android.material.snackbar.Snackbar
 import java.io.IOException
 import java.lang.Exception
 import java.util.*
@@ -27,7 +33,13 @@ import java.util.*
  */
 class RecipeDetailsFragment : Fragment() {
 
+  // view binding
   private var _binding: FragmentRecipeDetailsBinding? = null
+
+  // view models to update the data
+  val _recipeViewModel: RecipeViewModel by viewModels {
+    RecipeViewModelFactory((requireActivity().application as CookPadApplication).repository)
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -95,6 +107,21 @@ class RecipeDetailsFragment : Fragment() {
       _binding!!.tvIngredients.text = it.ingredients
       _binding!!.tvCookingDirection.text = it.instructions
       _binding!!.tvCookingTime.text = "Cooking Time: ${it.cookingTime}"
+
+      // make sure to update the icon
+      setFavouriteButtonIcon(args, view)
+    }
+
+    _binding!!.ivLikeRecipe.setOnClickListener {
+
+      // set to the opposite of the previous favourite state
+      args.recipeDetails.favouriteRecipe = !args.recipeDetails.favouriteRecipe
+
+      // update in db
+      _recipeViewModel.update(args.recipeDetails)
+
+      // make sure to update the icon
+      setFavouriteButtonIcon(args, view)
     }
   }
 
@@ -104,4 +131,23 @@ class RecipeDetailsFragment : Fragment() {
     _binding = null
   }
 
+
+  private fun setFavouriteButtonIcon(args: RecipeDetailsFragmentArgs, view: View) {
+    if (args.recipeDetails.favouriteRecipe) {
+      _binding!!.ivLikeRecipe.setImageDrawable(
+        ContextCompat.getDrawable(
+          requireActivity(), R.drawable.ic_favorite_selected
+        )
+      )
+
+      Snackbar.make(view, "Recipe added to your favourites!", Snackbar.LENGTH_SHORT).show()
+    } else {
+      _binding!!.ivLikeRecipe.setImageDrawable(
+        ContextCompat.getDrawable(
+          requireActivity(), R.drawable.ic_favorite_unselected
+        )
+      )
+      Snackbar.make(view, "Recipe removed from your favourites", Snackbar.LENGTH_SHORT).show()
+    }
+  }
 }

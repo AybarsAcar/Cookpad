@@ -19,7 +19,7 @@ data class Recipe(
   @ColumnInfo val ingredients: String,
   @ColumnInfo(name = "cooking_time") val cookingTime: String,
   @ColumnInfo val instructions: String,
-  @ColumnInfo(name = "favourite_recipe") val favouriteRecipe: Boolean = false,
+  @ColumnInfo(name = "favourite_recipe") var favouriteRecipe: Boolean = false,
 
   @PrimaryKey(autoGenerate = true) val id: Int = 0,
 

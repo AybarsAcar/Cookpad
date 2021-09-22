@@ -7,13 +7,17 @@ import kotlinx.coroutines.launch
 
 
 class RecipeViewModel(private val repository: RecipeRepository) : ViewModel() {
+  // cache the recipes as live data
+  val recipesList: LiveData<List<Recipe>> = repository.recipesList.asLiveData()
+  val favouriteRecipesList: LiveData<List<Recipe>> = repository.favouriteRecipes.asLiveData()
 
   fun insert(recipe: Recipe) = viewModelScope.launch {
     repository.insertRecipeDetailsData(recipe)
   }
 
-  // cache the recipes as live data
-  val recipesList: LiveData<List<Recipe>> = repository.recipesList.asLiveData()
+  fun update(recipe: Recipe) = viewModelScope.launch {
+    repository.updateRecipeData(recipe)
+  }
 }
 
 
