@@ -1,5 +1,7 @@
 package com.aybarsacar.cookpad.view.fragments
 
+import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -11,12 +13,16 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.aybarsacar.cookpad.R
 import com.aybarsacar.cookpad.application.CookPadApplication
+import com.aybarsacar.cookpad.databinding.DialogCustomListBinding
 import com.aybarsacar.cookpad.databinding.FragmentAllRecipesBinding
 import com.aybarsacar.cookpad.model.entities.Recipe
+import com.aybarsacar.cookpad.utils.Constants
 import com.aybarsacar.cookpad.view.activities.AddUpdateRecipeActivity
 import com.aybarsacar.cookpad.view.activities.MainActivity
+import com.aybarsacar.cookpad.view.adaptors.ListItemAdaptor
 import com.aybarsacar.cookpad.view.adaptors.RecipeCardAdaptor
 import com.aybarsacar.cookpad.viewmodel.HomeViewModel
 import com.aybarsacar.cookpad.viewmodel.RecipeViewModel
@@ -26,7 +32,9 @@ import com.aybarsacar.cookpad.viewmodel.RecipeViewModelFactory
 class AllRecipesFragment : Fragment() {
 
   private var _binding: FragmentAllRecipesBinding? = null
-  private val binding get() = _binding!!
+
+  private lateinit var _recipeCardAdapter: RecipeCardAdaptor
+  private lateinit var _customListDialog: Dialog
 
 
   // setup the view model to query
@@ -45,10 +53,10 @@ class AllRecipesFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
 
     // now _binding is available
-    binding.rvRecipesList.layoutManager = GridLayoutManager(requireActivity(), 2)
+    _binding!!.rvRecipesList.layoutManager = GridLayoutManager(requireActivity(), 2)
 
-    val recipeCardAdapter = RecipeCardAdaptor(this@AllRecipesFragment)
-    binding.rvRecipesList.adapter = recipeCardAdapter
+    _recipeCardAdapter = RecipeCardAdaptor(this@AllRecipesFragment)
+    _binding!!.rvRecipesList.adapter = _recipeCardAdapter
 
 
     // fetch all the recipes and observe it
@@ -58,15 +66,15 @@ class AllRecipesFragment : Fragment() {
         // display the cards
         if (it.isEmpty()) {
           // we don't have any recipes
-          binding.rvRecipesList.visibility = View.GONE
-          binding.tvNoRecipesAddedYet.visibility = View.VISIBLE
+          _binding!!.rvRecipesList.visibility = View.GONE
+          _binding!!.tvNoRecipesAddedYet.visibility = View.VISIBLE
         } else {
           // we have recipes to display
           // make sure set the visibility
-          binding.rvRecipesList.visibility = View.VISIBLE
-          binding.tvNoRecipesAddedYet.visibility = View.GONE
+          _binding!!.rvRecipesList.visibility = View.VISIBLE
+          _binding!!.tvNoRecipesAddedYet.visibility = View.GONE
 
-          recipeCardAdapter.recipesList(it)
+          _recipeCardAdapter.recipesList(it)
 
         }
       }
@@ -82,7 +90,7 @@ class AllRecipesFragment : Fragment() {
     // set up the binding inside of a fragment
     _binding = FragmentAllRecipesBinding.inflate(inflater, container, false)
 
-    return binding.root
+    return _binding!!.root
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -98,6 +106,11 @@ class AllRecipesFragment : Fragment() {
 
       R.id.action_add_recipe -> {
         startActivity(Intent(requireActivity(), AddUpdateRecipeActivity::class.java))
+        return true
+      }
+
+      R.id.action_filter_recipes -> {
+        displayFilterRecipesListDialog()
         return true
       }
     }
@@ -117,6 +130,80 @@ class AllRecipesFragment : Fragment() {
     if (requireActivity() is MainActivity) {
       (activity as MainActivity).showBottomNavigationView()
     }
+  }
+
+  fun handleFilterSelection(filterItemSelection: String) {
+    _customListDialog.dismiss()
+
+    Log.i("Filter Selection", filterItemSelection)
+
+    if (filterItemSelection == Constants.ALL_ITEMS) {
+      _recipeViewModel.recipesList.observe(viewLifecycleOwner) { recipes ->
+        recipes?.let {
+
+          // display the cards
+          if (it.isEmpty()) {
+            // we don't have any recipes
+            _binding!!.rvRecipesList.visibility = View.GONE
+            _binding!!.tvNoRecipesAddedYet.visibility = View.VISIBLE
+          } else {
+            // we have recipes to display
+            // make sure set the visibility
+            _binding!!.rvRecipesList.visibility = View.VISIBLE
+            _binding!!.tvNoRecipesAddedYet.visibility = View.GONE
+
+            _recipeCardAdapter.recipesList(it)
+          }
+        }
+      }
+    } else {
+      // not all items
+      Log.i("Filter List", "Get filter list")
+    }
+  }
+
+  private fun displayFilterRecipesListDialog() {
+    _customListDialog = Dialog(requireActivity())
+    val binding = DialogCustomListBinding.inflate(layoutInflater)
+
+    _customListDialog.setContentView(binding.root)
+    binding.tvTitle.text = "Select Item to filter"
+
+    // setup the recycler view based on recipe types
+    val recipeTypes = Constants.recipeTypes()
+    recipeTypes.add(0, Constants.ALL_ITEMS)
+
+    binding.rvList.layoutManager = LinearLayoutManager(requireActivity())
+
+    val adapter = ListItemAdaptor(requireActivity(), this@AllRecipesFragment, recipeTypes, Constants.FILTER_SELECTION)
+
+    binding.rvList.adapter = adapter
+
+    _customListDialog.show()
+  }
+
+  /**
+   * handles removing the recipe
+   */
+  fun handleRemoveRecipe(recipe: Recipe) {
+
+    // build an aler dialog
+    val builder = AlertDialog.Builder(requireActivity())
+      .setTitle("Delete Recipe")
+      .setMessage("Are you sure you want to delete ${recipe.title}?")
+      .setIcon(android.R.drawable.ic_dialog_alert)
+      .setPositiveButton("Yes") { dialogInterface, _ ->
+        // delete recipe is the user clicks yes
+        _recipeViewModel.remove(recipe)
+        dialogInterface.dismiss()
+      }
+      .setNegativeButton("No") { dialogInterface, _ ->
+        dialogInterface.dismiss()
+      }
+
+    val dialog = builder.create()
+    dialog.setCancelable(false)
+    dialog.show()
   }
 
   /**

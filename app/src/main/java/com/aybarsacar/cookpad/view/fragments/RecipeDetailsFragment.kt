@@ -109,7 +109,7 @@ class RecipeDetailsFragment : Fragment() {
       _binding!!.tvCookingTime.text = "Cooking Time: ${it.cookingTime}"
 
       // make sure to update the icon
-      setFavouriteButtonIcon(args, view)
+      setFavouriteButtonIcon(args, view, false)
     }
 
     _binding!!.ivLikeRecipe.setOnClickListener {
@@ -121,7 +121,7 @@ class RecipeDetailsFragment : Fragment() {
       _recipeViewModel.update(args.recipeDetails)
 
       // make sure to update the icon
-      setFavouriteButtonIcon(args, view)
+      setFavouriteButtonIcon(args, view, true)
     }
   }
 
@@ -132,7 +132,7 @@ class RecipeDetailsFragment : Fragment() {
   }
 
 
-  private fun setFavouriteButtonIcon(args: RecipeDetailsFragmentArgs, view: View) {
+  private fun setFavouriteButtonIcon(args: RecipeDetailsFragmentArgs, view: View, isRecipeUpdated: Boolean) {
     if (args.recipeDetails.favouriteRecipe) {
       _binding!!.ivLikeRecipe.setImageDrawable(
         ContextCompat.getDrawable(
@@ -140,14 +140,19 @@ class RecipeDetailsFragment : Fragment() {
         )
       )
 
-      Snackbar.make(view, "Recipe added to your favourites!", Snackbar.LENGTH_SHORT).show()
+      if (isRecipeUpdated) {
+        Snackbar.make(view, "Recipe added to your favourites!", Snackbar.LENGTH_LONG).show()
+      }
     } else {
       _binding!!.ivLikeRecipe.setImageDrawable(
         ContextCompat.getDrawable(
           requireActivity(), R.drawable.ic_favorite_unselected
         )
       )
-      Snackbar.make(view, "Recipe removed from your favourites", Snackbar.LENGTH_SHORT).show()
+
+      if (isRecipeUpdated) {
+        Snackbar.make(view, "Recipe removed from your favourites", Snackbar.LENGTH_LONG).show()
+      }
     }
   }
 }

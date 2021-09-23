@@ -1,9 +1,6 @@
 package com.aybarsacar.cookpad.model.database
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import com.aybarsacar.cookpad.model.entities.Recipe
 import kotlinx.coroutines.flow.Flow
 
@@ -28,4 +25,7 @@ interface RecipeDao {
 
   @Query("select * from recipe_table where favourite_recipe = 1 order by id")
   fun getFavouriteRecipesList(): Flow<List<Recipe>>
+
+  @Delete
+  suspend fun deleteRecipe(recipe: Recipe)
 }

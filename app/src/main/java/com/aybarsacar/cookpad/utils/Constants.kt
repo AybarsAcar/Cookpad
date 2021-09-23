@@ -9,6 +9,11 @@ object Constants {
   const val RECIPE_IMAGE_SOURCE_LOCAL: String = "Local"
   const val RECIPE_IMAGE_SOURCE_ONLINE: String = "Online"
 
+  const val ALL_ITEMS: String = "All"
+  const val FILTER_SELECTION: String = "FilterSelection"
+
+  const val EXTRA_RECIPE_DETAILS: String = "RecipeDetails"
+
   fun recipeTypes(): ArrayList<String> {
     return arrayListOf(
       "breakfast",

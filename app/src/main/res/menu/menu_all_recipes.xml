@@ -3,8 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_filter_recipes"
+        android:icon="@drawable/ic_baseline_filter_list_24"
+        android:orderInCategory="100"
+        android:title="Filter Recipes"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_add_recipe"
         android:icon="@drawable/ic_add"
+        android:orderInCategory="101"
         android:title="@string/add_recipe"
         app:showAsAction="always" />
 

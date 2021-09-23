@@ -4,9 +4,12 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable/favorite_button_background.xml" value="0.44166666666666665" />
+        <entry key="app/src/main/res/drawable/ic_add.xml" value="0.44166666666666665" />
         <entry key="app/src/main/res/drawable/ic_add_photo.xml" value="0.32395833333333335" />
         <entry key="app/src/main/res/drawable/ic_baseline_camera.xml" value="0.32395833333333335" />
+        <entry key="app/src/main/res/drawable/ic_baseline_delete_outline_24.xml" value="0.44166666666666665" />
         <entry key="app/src/main/res/drawable/ic_baseline_gallery.xml" value="0.32395833333333335" />
+        <entry key="app/src/main/res/drawable/ic_baseline_more_vert_24.xml" value="0.44166666666666665" />
         <entry key="app/src/main/res/drawable/ic_favorite_selected.xml" value="0.5354166666666667" />
         <entry key="app/src/main/res/drawable/ic_favorite_unselected.xml" value="0.5354166666666667" />
         <entry key="app/src/main/res/layout/activity_add_update_recipe.xml" value="0.3357142857142857" />
@@ -16,13 +19,16 @@
         <entry key="app/src/main/res/layout/dialog_custom_list.xml" value="0.30434782608695654" />
         <entry key="app/src/main/res/layout/fragment_all_recipes.xml" value="0.21693840579710144" />
         <entry key="app/src/main/res/layout/fragment_dashboard.xml" value="0.30434782608695654" />
+        <entry key="app/src/main/res/layout/fragment_favourite_recipes.xml" value="0.5192708333333333" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.5192708333333333" />
         <entry key="app/src/main/res/layout/fragment_notifications.xml" value="0.30434782608695654" />
         <entry key="app/src/main/res/layout/fragment_recipe_details.xml" value="0.2921195652173913" />
         <entry key="app/src/main/res/layout/item_custom_list.xml" value="0.30434782608695654" />
         <entry key="app/src/main/res/layout/item_recipe_layout.xml" value="0.30434782608695654" />
         <entry key="app/src/main/res/menu/bottom_nav_menu.xml" value="0.5192708333333333" />
+        <entry key="app/src/main/res/menu/menu_adapter.xml" value="0.5192708333333333" />
         <entry key="app/src/main/res/menu/menu_all_dishes.xml" value="0.5192708333333333" />
+        <entry key="app/src/main/res/menu/menu_all_recipes.xml" value="0.5192708333333333" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.32395833333333335" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.32395833333333335" />
       </map>

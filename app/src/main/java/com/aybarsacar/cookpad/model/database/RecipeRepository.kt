@@ -24,4 +24,10 @@ class RecipeRepository(private val recipeDao: RecipeDao) {
   }
 
   val favouriteRecipes: Flow<List<Recipe>> = recipeDao.getFavouriteRecipesList()
+
+
+  @WorkerThread
+  suspend fun deleteRecipeData(recipe: Recipe) {
+    recipeDao.deleteRecipe(recipe)
+  }
 }

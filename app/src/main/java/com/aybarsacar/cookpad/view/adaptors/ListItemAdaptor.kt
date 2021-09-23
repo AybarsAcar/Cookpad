@@ -3,9 +3,11 @@ package com.aybarsacar.cookpad.view.adaptors
 import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.aybarsacar.cookpad.databinding.ItemCustomListBinding
 import com.aybarsacar.cookpad.view.activities.AddUpdateRecipeActivity
+import com.aybarsacar.cookpad.view.fragments.AllRecipesFragment
 
 /**
  * used to dynamically render the views in the list
@@ -13,6 +15,7 @@ import com.aybarsacar.cookpad.view.activities.AddUpdateRecipeActivity
  */
 class ListItemAdaptor(
   private val activity: Activity,
+  private val fragment: Fragment?,
   private val listItems: List<String>,
   private val selection: String
 ) : RecyclerView.Adapter<ListItemAdaptor.ViewHolder>() {
@@ -27,7 +30,6 @@ class ListItemAdaptor(
     val binding: ItemCustomListBinding = ItemCustomListBinding.inflate(LayoutInflater.from(activity), parent, false)
 
     return ViewHolder(binding)
-
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -41,6 +43,11 @@ class ListItemAdaptor(
     holder.itemView.setOnClickListener {
       if (activity is AddUpdateRecipeActivity) {
         activity.handleListItemSelection(item, selection)
+      }
+
+      if (fragment is AllRecipesFragment) {
+        // if we are on the all recipes fragment
+        fragment.handleFilterSelection(item)
       }
     }
   }

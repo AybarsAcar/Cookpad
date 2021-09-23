@@ -71,6 +71,8 @@ class AddUpdateRecipeActivity : AppCompatActivity(), View.OnClickListener {
     RecipeViewModelFactory((application as CookPadApplication).repository)
   }
 
+  private var _recipeDetails: Recipe? = null
+
 
   // view binding variable
   private lateinit var _binding: ActivityAddUpdateRecipeBinding
@@ -160,7 +162,37 @@ class AddUpdateRecipeActivity : AppCompatActivity(), View.OnClickListener {
     _binding = ActivityAddUpdateRecipeBinding.inflate(layoutInflater)
     setContentView(_binding.root)
 
+
+    // if we passed in recipe details
+    if (intent.hasExtra(Constants.EXTRA_RECIPE_DETAILS)) {
+      // cache the recipe details
+      _recipeDetails = intent.getParcelableExtra(Constants.EXTRA_RECIPE_DETAILS)
+    }
+
+
     setupActionBar()
+
+
+    // populate our data if _recipeDetails cached in
+    _recipeDetails?.let {
+      if (it.id != 0) {
+        _imagePath = it.image
+
+        Glide.with(this@AddUpdateRecipeActivity)
+          .load(it.image)
+          .centerCrop()
+          .into(_binding.ivRecipeImage)
+
+        _binding.etTitle.setText(it.title)
+        _binding.etType.setText(it.type)
+        _binding.etCategory.setText(it.category)
+        _binding.etIngredients.setText(it.ingredients)
+        _binding.etCookingTime.setText(it.cookingTime)
+        _binding.etDirectionToCook.setText(it.instructions)
+
+        _binding.btnAddDish.text = "Edit Recipe"
+      }
+    }
 
     // bind onclick listeners to our clickables on our view
     _binding.ivAddRecipeImage.setOnClickListener(this)
@@ -174,6 +206,16 @@ class AddUpdateRecipeActivity : AppCompatActivity(), View.OnClickListener {
   private fun setupActionBar() {
     setSupportActionBar(_binding.toolbarAddRecipeActivity)
     supportActionBar?.setDisplayHomeAsUpEnabled(true) // allow the back button
+
+    if (_recipeDetails != null && _recipeDetails!!.id != 0) {
+      supportActionBar?.let {
+        it.title = "Edit Recipe"
+      }
+    } else {
+      supportActionBar?.let {
+        it.title = "Create a Recipe"
+      }
+    }
 
     _binding.toolbarAddRecipeActivity.setNavigationOnClickListener {
       onBackPressed() // replicate the back button
@@ -312,7 +354,7 @@ class AddUpdateRecipeActivity : AppCompatActivity(), View.OnClickListener {
     binding.rvList.layoutManager = LinearLayoutManager(this)
 
     // set up the adapter
-    val adapter = ListItemAdaptor(this, itemList, selection)
+    val adapter = ListItemAdaptor(this, null, itemList, selection)
     binding.rvList.adapter = adapter
 
     _listDialog.show()
@@ -415,23 +457,46 @@ class AddUpdateRecipeActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             else -> {
+              var recipeId = 0
+              var imageSource = Constants.RECIPE_IMAGE_SOURCE_LOCAL
+              var favouriteRecipe = false
+
+              _recipeDetails?.let {
+
+                if (it.id != 0) {
+                  recipeId = it.id
+                  imageSource = it.imageSource
+                  favouriteRecipe = it.favouriteRecipe
+                }
+              }
+
               // data is clean we can post it
               // add the new recipe to the database
               val recipeToInsert = Recipe(
                 _imagePath,
-                Constants.RECIPE_IMAGE_SOURCE_LOCAL,
+                imageSource,
                 title,
                 type,
                 category,
                 ingredients,
                 cookingTimeInMinutes,
                 cookingInstructions,
-                true
+                favouriteRecipe,
+                recipeId
               )
 
-              _recipeViewModel.insert(recipeToInsert)
+              if (recipeId == 0) {
+                // we have created a new recipe
+                _recipeViewModel.insert(recipeToInsert)
 
-              Toast.makeText(this@AddUpdateRecipeActivity, "Recipe is added successfully!", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@AddUpdateRecipeActivity, "Recipe is added successfully!", Toast.LENGTH_LONG).show()
+
+              } else {
+                // we are editing / updating the recipe
+                _recipeViewModel.update(recipeToInsert)
+                Toast.makeText(this@AddUpdateRecipeActivity, "Recipe is updated successfully!", Toast.LENGTH_LONG)
+                  .show()
+              }
 
               // close the current activity
               finish()
