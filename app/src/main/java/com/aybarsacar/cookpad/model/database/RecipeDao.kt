@@ -26,6 +26,11 @@ interface RecipeDao {
   @Query("select * from recipe_table where favourite_recipe = 1 order by id")
   fun getFavouriteRecipesList(): Flow<List<Recipe>>
 
+
   @Delete
   suspend fun deleteRecipe(recipe: Recipe)
+
+
+  @Query("select * from recipe_table where type = :filter")
+  fun getFilteredRecipesList(filter: String): Flow<List<Recipe>>
 }

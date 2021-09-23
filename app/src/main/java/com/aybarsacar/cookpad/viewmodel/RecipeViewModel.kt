@@ -22,6 +22,8 @@ class RecipeViewModel(private val repository: RecipeRepository) : ViewModel() {
   fun remove(recipe: Recipe) = viewModelScope.launch {
     repository.deleteRecipeData(recipe)
   }
+
+  fun getFilteredList(filter: String): LiveData<List<Recipe>> = repository.filteredListRecipes(filter).asLiveData()
 }
 
 
