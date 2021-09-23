@@ -29,7 +29,7 @@
         android:id="@+id/navigation_random_recipe"
         android:name="com.aybarsacar.cookpad.view.fragments.RandomRecipeFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_random_dish" />
+        tools:layout="@layout/fragment_random_recipe" />
 
     <fragment
         android:id="@+id/navigation_recipe_details"
