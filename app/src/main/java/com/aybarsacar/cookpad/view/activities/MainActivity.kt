@@ -1,6 +1,7 @@
 package com.aybarsacar.cookpad.view.activities
 
 import android.os.Bundle
+import android.view.View
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
@@ -47,10 +48,12 @@ class MainActivity : AppCompatActivity() {
   fun hideBottomNavigationView() {
     _binding.navView.clearAnimation()
     _binding.navView.animate().translationY(_binding.navView.height.toFloat()).duration = 300
+    _binding.navView.visibility = View.GONE
   }
 
   fun showBottomNavigationView() {
     _binding.navView.clearAnimation()
     _binding.navView.animate().translationY(0f).duration = 300
+    _binding.navView.visibility = View.VISIBLE
   }
 }
