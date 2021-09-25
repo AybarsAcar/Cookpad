@@ -1,6 +1,7 @@
 package com.aybarsacar.cookpad.view.activities
 
 import android.os.Bundle
+import android.provider.SyncStateContract
 import android.view.View
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
@@ -14,6 +15,7 @@ import androidx.work.*
 import com.aybarsacar.cookpad.R
 import com.aybarsacar.cookpad.databinding.ActivityMainBinding
 import com.aybarsacar.cookpad.model.notification.NotificationWorker
+import com.aybarsacar.cookpad.utils.Constants
 import java.util.concurrent.TimeUnit
 
 
@@ -42,6 +44,14 @@ class MainActivity : AppCompatActivity() {
 
     // render the back button
     _binding.navView.setupWithNavController(_navController)
+
+    if (intent.hasExtra(Constants.NOTIFICATION_ID)) {
+      // user came from clicking on the notification
+      val notificationId = intent.getIntExtra(Constants.NOTIFICATION_ID, 0)
+
+      // send them to the random recipe page
+      _binding!!.navView.selectedItemId = R.id.navigation_random_recipe
+    }
 
     // start our work threads for the app when it is not running
     startPeriodicWork()

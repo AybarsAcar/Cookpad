@@ -24,6 +24,11 @@ object Constants {
   const val TAGS_DEFAULT_VALUE: String = "vegetarian, dessert"
   const val NUMBER_DEFAULT_VALUE: Int = 1
 
+  // Notification related
+  const val NOTIFICATION_ID = "cookpad_notification_id"
+  const val NOTIFICATION_NAME = "CookPad"
+  const val NOTIFICATION_CHANNEL = "cookpad_channel_01"
+
   fun recipeTypes(): ArrayList<String> {
     return arrayListOf(
       "breakfast",
