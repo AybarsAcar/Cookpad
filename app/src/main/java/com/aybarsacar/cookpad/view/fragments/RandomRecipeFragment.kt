@@ -1,14 +1,12 @@
 package com.aybarsacar.cookpad.view.fragments
 
-import android.content.Context
+import android.app.Dialog
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -25,12 +23,16 @@ import com.aybarsacar.cookpad.viewmodel.RecipeViewModelFactory
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 
+
 class RandomRecipeFragment : Fragment() {
 
   private var _binding: FragmentRandomRecipeBinding? = null
 
   // view models
   lateinit var _randomRecipeViewModel: RandomRecipeViewModel
+
+  // view caches
+  private var _loadingDialog: Dialog? = null
 
 
   override fun onCreateView(
@@ -53,13 +55,20 @@ class RandomRecipeFragment : Fragment() {
     // load a random dish on a view created
     _randomRecipeViewModel.getRandomRecipeFromAPI()
     randomRecipeViewModelObserver()
+
+    _binding!!.rlRecipeRandomMain.setOnRefreshListener {
+      _randomRecipeViewModel.getRandomRecipeFromAPI()
+    }
   }
 
   private fun randomRecipeViewModelObserver() {
     _randomRecipeViewModel.randomRecipeResponse.observe(viewLifecycleOwner, { randomRecipeResponse ->
 
       randomRecipeResponse?.let {
-        println("Random Recipe Response ${randomRecipeResponse.recipes[0]}")
+
+        if (_binding!!.rlRecipeRandomMain.isRefreshing) {
+          _binding!!.rlRecipeRandomMain.isRefreshing = false
+        }
 
         handleRandomRecipeResponseUI(randomRecipeResponse.recipes[0])
       }
@@ -68,6 +77,11 @@ class RandomRecipeFragment : Fragment() {
     _randomRecipeViewModel.randomRecipeLoadingError.observe(viewLifecycleOwner, { dataError ->
 
       dataError?.let {
+
+        if (_binding!!.rlRecipeRandomMain.isRefreshing) {
+          _binding!!.rlRecipeRandomMain.isRefreshing = false
+        }
+
         println("Error $dataError")
       }
     })
@@ -75,7 +89,12 @@ class RandomRecipeFragment : Fragment() {
     _randomRecipeViewModel.loadRandomRecipe.observe(viewLifecycleOwner, { loadRandomRecipe ->
 
       loadRandomRecipe?.let {
-        println("Random Recipe Loading $loadRandomRecipe")
+        // loading state
+        if (loadRandomRecipe && !_binding!!.rlRecipeRandomMain.isRefreshing) {
+          displayLoadingDialog()
+        } else {
+          hideLoadingDialog()
+        }
       }
     })
   }
@@ -107,6 +126,12 @@ class RandomRecipeFragment : Fragment() {
       }
     }
 
+    _binding!!.ivLikeRecipe.setImageDrawable(
+      ContextCompat.getDrawable(requireActivity(), R.drawable.ic_favorite_unselected)
+    )
+
+    var addedToFavourites = false
+
     _binding!!.tvIngredients.text = ingredients
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -121,33 +146,55 @@ class RandomRecipeFragment : Fragment() {
     // we will save the recipe into our on machine sqlite database
     _binding!!.ivLikeRecipe.setOnClickListener {
 
-      val recipeToInsert = Recipe(
-        recipe.image,
-        Constants.RECIPE_IMAGE_SOURCE_ONLINE,
-        recipe.title,
-        recipeType,
-        "Other",
-        ingredients,
-        recipe.readyInMinutes.toString(),
-        recipe.instructions,
-        true,
-      )
+      if (addedToFavourites) {
 
-      val recipeViewModel: RecipeViewModel by viewModels {
-        RecipeViewModelFactory((requireActivity().application as CookPadApplication).repository)
-      }
+        Snackbar.make(requireView(), "Recipe already added to favourites", Snackbar.LENGTH_SHORT).show()
 
-      recipeViewModel.insert(recipeToInsert)
+      } else {
 
-      _binding!!.ivLikeRecipe.setImageDrawable(
-        ContextCompat.getDrawable(
-          requireActivity(),
-          R.drawable.ic_favorite_selected
+        val recipeToInsert = Recipe(
+          recipe.image,
+          Constants.RECIPE_IMAGE_SOURCE_ONLINE,
+          recipe.title,
+          recipeType,
+          "Other",
+          ingredients,
+          recipe.readyInMinutes.toString(),
+          recipe.instructions,
+          true,
         )
-      )
 
-      Snackbar.make(requireView(), "Recipe added to favourites", Snackbar.LENGTH_SHORT).show()
+        val recipeViewModel: RecipeViewModel by viewModels {
+          RecipeViewModelFactory((requireActivity().application as CookPadApplication).repository)
+        }
+
+        recipeViewModel.insert(recipeToInsert)
+
+        addedToFavourites = true
+
+        _binding!!.ivLikeRecipe.setImageDrawable(
+          ContextCompat.getDrawable(
+            requireActivity(),
+            R.drawable.ic_favorite_selected
+          )
+        )
+
+        Snackbar.make(requireView(), "Recipe added to favourites", Snackbar.LENGTH_SHORT).show()
+      }
     }
+  }
+
+  private fun displayLoadingDialog() {
+    _loadingDialog = Dialog(requireActivity())
+
+    _loadingDialog?.let {
+      it.setContentView(R.layout.dialog_custom_loading)
+      it.show()
+    }
+  }
+
+  private fun hideLoadingDialog() {
+    _loadingDialog?.dismiss()
   }
 
   override fun onDestroyView() {

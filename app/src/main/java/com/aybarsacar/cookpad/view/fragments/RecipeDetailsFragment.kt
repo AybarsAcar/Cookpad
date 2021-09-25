@@ -1,12 +1,13 @@
 package com.aybarsacar.cookpad.view.fragments
 
+import android.content.Intent
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
 import android.util.Log
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.viewModels
@@ -15,6 +16,8 @@ import androidx.palette.graphics.Palette
 import com.aybarsacar.cookpad.R
 import com.aybarsacar.cookpad.application.CookPadApplication
 import com.aybarsacar.cookpad.databinding.FragmentRecipeDetailsBinding
+import com.aybarsacar.cookpad.model.entities.Recipe
+import com.aybarsacar.cookpad.utils.Constants
 import com.aybarsacar.cookpad.viewmodel.RecipeViewModel
 import com.aybarsacar.cookpad.viewmodel.RecipeViewModelFactory
 import com.bumptech.glide.Glide
@@ -41,8 +44,65 @@ class RecipeDetailsFragment : Fragment() {
     RecipeViewModelFactory((requireActivity().application as CookPadApplication).repository)
   }
 
+  // caches
+  private var _selectedRecipeDetails: Recipe? = null
+
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
+    setHasOptionsMenu(true)
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+
+    // inflate the menu layout
+    inflater.inflate(R.menu.menu_share, menu)
+
+    super.onCreateOptionsMenu(menu, inflater)
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+    if (item.itemId == R.id.action_share_recipe) {
+      // share recipe
+      val type = "text/plain"
+      val subject = "Check out the Recipe"
+      var extraText = ""
+      val shareWith = "Share with"
+
+      _selectedRecipeDetails?.let {
+        var image = ""
+        if (it.imageSource == Constants.RECIPE_IMAGE_SOURCE_ONLINE) {
+          image = it.image
+        }
+
+        var cookingInstructions = ""
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+          cookingInstructions = Html.fromHtml(it.instructions, Html.FROM_HTML_MODE_COMPACT).toString()
+        } else {
+          @Suppress("DEPRECATION")
+          cookingInstructions = Html.fromHtml(it.instructions).toString()
+        }
+
+        extraText = "$image \n" +
+            "\n Title: ${it.title} \n\n Type: ${it.type} \n\n" +
+            "Category: ${it.category}" +
+            "\n\n Ingredients: \n ${it.ingredients} \n\n Instructions " +
+            "to Cook: \n $cookingInstructions" +
+            "\n\n Time required to cook the recipe is approx ${it.cookingTime} minutes"
+      }
+
+      val intent = Intent(Intent.ACTION_SEND)
+      intent.type = type
+      intent.putExtra(Intent.EXTRA_SUBJECT, subject)
+      intent.putExtra(Intent.EXTRA_TEXT, extraText)
+      startActivity(Intent.createChooser(intent, shareWith))
+
+      return true
+    }
+
+    return super.onOptionsItemSelected(item)
   }
 
   override fun onCreateView(
@@ -61,6 +121,9 @@ class RecipeDetailsFragment : Fragment() {
     // get the navigation arguments
     val args: RecipeDetailsFragmentArgs by navArgs()
     val recipe = args.recipeDetails
+
+    _selectedRecipeDetails = args.recipeDetails
+
 
     recipe.let {
       try {
@@ -105,8 +168,14 @@ class RecipeDetailsFragment : Fragment() {
       _binding!!.tvType.text = it.type.capitalize(Locale.ROOT)
       _binding!!.tvCategory.text = it.category
       _binding!!.tvIngredients.text = it.ingredients
-      _binding!!.tvCookingDirection.text = it.instructions
       _binding!!.tvCookingTime.text = "Cooking Time: ${it.cookingTime}"
+
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        _binding!!.tvCookingDirection.text = Html.fromHtml(it.instructions, Html.FROM_HTML_MODE_COMPACT).toString()
+      } else {
+        @Suppress("DEPRECATION")
+        _binding!!.tvCookingDirection.text = Html.fromHtml(it.instructions).toString()
+      }
 
       // make sure to update the icon
       setFavouriteButtonIcon(args, view, false)

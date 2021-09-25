@@ -10,8 +10,12 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.work.*
 import com.aybarsacar.cookpad.R
 import com.aybarsacar.cookpad.databinding.ActivityMainBinding
+import com.aybarsacar.cookpad.model.notification.NotificationWorker
+import java.util.concurrent.TimeUnit
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -38,6 +42,9 @@ class MainActivity : AppCompatActivity() {
 
     // render the back button
     _binding.navView.setupWithNavController(_navController)
+
+    // start our work threads for the app when it is not running
+    startPeriodicWork()
   }
 
   override fun onSupportNavigateUp(): Boolean {
@@ -55,5 +62,25 @@ class MainActivity : AppCompatActivity() {
     _binding.navView.clearAnimation()
     _binding.navView.animate().translationY(0f).duration = 300
     _binding.navView.visibility = View.VISIBLE
+  }
+
+
+  private fun createConstraints() = Constraints.Builder()
+    .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+    .setRequiresCharging(false)
+    .setRequiresBatteryNotLow(true)
+    .build()
+
+
+  private fun createWorkRequest() = PeriodicWorkRequestBuilder<NotificationWorker>(15, TimeUnit.MINUTES)
+    .setConstraints(createConstraints())
+    .build()
+
+  /**
+   * called from the onCreate of our MainActivity application
+   */
+  private fun startPeriodicWork() {
+    WorkManager.getInstance(this@MainActivity)
+      .enqueueUniquePeriodicWork("CookPad Period Work", ExistingPeriodicWorkPolicy.KEEP, createWorkRequest())
   }
 }
